@@ -1,0 +1,113 @@
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+
+const questions = [
+  {
+    text: "¿Qué haces cuando ves basura en la calle?",
+    options: ["A", "B", "C", "D"],
+  },
+  {
+    text: "¿Separás los residuos en tu casa?",
+    options: ["A", "B", "C", "D"],
+  },
+  {
+    text: "¿Qué haces con botellas plásticas vacías?",
+    options: ["A", "B", "C", "D"],
+  },
+  {
+    text: "¿Cómo describes tu consumo de agua?",
+    options: ["A", "B", "C", "D"],
+  },
+];
+
+const results = {
+  A: {
+    name: "Bob Esponja",
+    description:
+      "¡Súper comprometido con el medio ambiente! Siempre hacés lo correcto.",
+    image: "https://upload.wikimedia.org/wikipedia/en/3/3b/SpongeBob_SquarePants_character.png",
+  },
+  B: {
+    name: "Arenita",
+    description:
+      "Tenés buenas intenciones y sabés lo importante que es cuidar el planeta.",
+    image: "https://upload.wikimedia.org/wikipedia/en/e/e0/Sandy_Cheeks.png",
+  },
+  C: {
+    name: "Patricio",
+    description:
+      "No sos muy consciente de tus actos, pero podés mejorar mucho con un poco de guía.",
+    image: "https://upload.wikimedia.org/wikipedia/en/3/33/Patrick_Star.png",
+  },
+  D: {
+    name: "Calamardo",
+    description:
+      "Te cuesta comprometerte con causas ambientales. ¡Pero nunca es tarde!",
+    image: "https://upload.wikimedia.org/wikipedia/en/8/84/Squidward_Tentacles.png",
+  },
+};
+
+export default function Quiz() {
+  const [answers, setAnswers] = useState(Array(questions.length).fill(null));
+  const [showResult, setShowResult] = useState(false);
+
+  const handleSelect = (questionIndex, option) => {
+    const updatedAnswers = [...answers];
+    updatedAnswers[questionIndex] = option;
+    setAnswers(updatedAnswers);
+  };
+
+  const calculateResult = () => {
+    const count = { A: 0, B: 0, C: 0, D: 0 };
+    answers.forEach((ans) => {
+      if (ans) count[ans]++;
+    });
+    const majority = Object.entries(count).sort((a, b) => b[1] - a[1])[0][0];
+    return results[majority];
+  };
+
+  return (
+    <div className="max-w-xl mx-auto p-4 space-y-6">
+      {questions.map((q, i) => (
+        <Card key={i}>
+          <CardContent className="p-4">
+            <p className="font-semibold">{q.text}</p>
+            <div className="flex gap-2 mt-2">
+              {q.options.map((opt) => (
+                <Button
+                  key={opt}
+                  variant={answers[i] === opt ? "default" : "outline"}
+                  onClick={() => handleSelect(i, opt)}
+                >
+                  {opt}
+                </Button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+      <Button
+        className="w-full"
+        onClick={() => setShowResult(true)}
+        disabled={answers.includes(null)}
+      >
+        Ver resultado
+      </Button>
+
+      {showResult && (
+        <Card className="mt-4">
+          <CardContent className="p-4 space-y-4 text-center">
+            <h2 className="text-xl font-bold">{calculateResult().name}</h2>
+            <img
+              src={calculateResult().image}
+              alt={calculateResult().name}
+              className="mx-auto w-32 h-32 object-contain"
+            />
+            <p>{calculateResult().description}</p>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+}
